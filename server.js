@@ -65,10 +65,4 @@ app.get('/', (req, res) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`==================================================`);
-  console.log(`📸 Disposable Camera Backend is running!`);
-  console.log(`🚀 Server URL: http://localhost:${PORT}`);
-  console.log(`📅 Started at: ${new Date().toISOString()}`);
-  console.log(`==================================================`);
-});
+module.exports = app;
