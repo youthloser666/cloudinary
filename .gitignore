@@ -1,0 +1,14 @@
+# Dependency directories
+node_modules/
+
+# Local environment files (containing secrets)
+.env
+.env.local
+.env.*.local
+
+# Prisma
+/prisma/migration_lock.toml
+
+# OS Files
+.DS_Store
+Thumbs.db
