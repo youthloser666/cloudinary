@@ -55,7 +55,7 @@ app.post('/api/photos', async (req, res) => {
 app.get('/api/config/cloudinary', (req, res) => {
   res.json({
     cloudName: process.env.CLOUDINARY_CLOUD_NAME || 'dqjrd00yu',
-    uploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET || 'mfwc_upload'
+    uploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET || 'mfwcupload'
   });
 });
 
