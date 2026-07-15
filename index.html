@@ -578,10 +578,236 @@
         .toast.show {
             transform: translateX(-50%) translateY(0);
         }
+
+        /* Introduction Screen */
+        .intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 50% 20%, rgba(255, 82, 82, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(255, 179, 0, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(28, 28, 34, 0.5) 0%, rgba(13, 13, 16, 0.98) 100%);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .intro-screen.hiding {
+            animation: introFadeOut 0.5s ease forwards;
+            pointer-events: none;
+        }
+
+        @keyframes introFadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(1.04); }
+        }
+
+        .intro-content {
+            text-align: center;
+            max-width: 380px;
+            animation: introContentIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes introContentIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .intro-camera-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            background: rgba(255, 82, 82, 0.08);
+            border: 2px solid rgba(255, 82, 82, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            animation: iconPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.1); }
+            50% { box-shadow: 0 0 0 12px rgba(255, 82, 82, 0); }
+        }
+
+        .intro-logo-text {
+            font-family: var(--font-retro);
+            font-size: 2.2rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #e2e2e9;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .intro-logo-text span {
+            background: var(--camera-accent);
+            color: #000;
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+
+        .intro-tagline {
+            font-family: var(--font-retro);
+            font-size: 0.8rem;
+            color: var(--lcd-glow);
+            text-shadow: 0 0 8px var(--lcd-glow-dim);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .intro-divider {
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+            margin: 0 auto 20px;
+        }
+
+        .intro-desc {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            color: #8c8c9a;
+            line-height: 1.8;
+            margin-bottom: 24px;
+            padding: 0 8px;
+        }
+
+        .intro-features {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .intro-feature {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            color: #b0b0bc;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: border-color 0.2s;
+        }
+
+        .intro-feature:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .intro-feature-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .intro-btn {
+            background: linear-gradient(135deg, #ff5252, #cc1e1e);
+            color: #fff;
+            border: none;
+            padding: 16px 48px;
+            border-radius: 14px;
+            font-family: var(--font-retro);
+            font-size: 1rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(255, 82, 82, 0.25), 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-transform: uppercase;
+        }
+
+        .intro-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(255, 82, 82, 0.35), 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .intro-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 4px 12px rgba(255, 82, 82, 0.2);
+        }
+
+        .intro-footer {
+            margin-top: 24px;
+            font-family: var(--font-retro);
+            font-size: 0.6rem;
+            color: #333;
+            letter-spacing: 1px;
+        }
+
+        /* Slider cross-browser fixes */
+        .range-slider::-webkit-slider-runnable-track {
+            height: 6px;
+            border-radius: 3px;
+            background: transparent;
+        }
+
+        .range-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--camera-accent);
+            border: 3px solid #000;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .range-slider::-moz-range-track {
+            height: 6px;
+            background: transparent;
+            border-radius: 3px;
+            border: none;
+        }
     </style>
 </head>
 
 <body>
+
+    <!-- Introduction Screen -->
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-content">
+            <div class="intro-camera-icon">📷</div>
+            <div class="intro-logo-text">DISPO <span>CAM-100</span></div>
+            <div class="intro-tagline">Kamera Analog Digital</div>
+            <div class="intro-divider"></div>
+            <p class="intro-desc">
+                Selamat datang di DISPO! Ubah foto biasa kamu jadi karya seni bergaya
+                film analog klasik. Pilih roll film favoritmu, atur intensitas
+                eksposur, lalu jepret dan simpan hasilnya.
+            </p>
+            <div class="intro-features">
+                <div class="intro-feature">
+                    <span class="intro-feature-icon">🎞️</span>
+                    <span>5 pilihan roll film analog autentik</span>
+                </div>
+                <div class="intro-feature">
+                    <span class="intro-feature-icon">🎛️</span>
+                    <span>Kontrol intensitas eksposur sesuai selera</span>
+                </div>
+                <div class="intro-feature">
+                    <span class="intro-feature-icon">💾</span>
+                    <span>Simpan hasil jepretan ke galeri digital</span>
+                </div>
+            </div>
+            <button class="intro-btn" id="introBtn">MULAI MOTRET →</button>
+            <div class="intro-footer">v1.2 · Powered by Cloudinary</div>
+        </div>
+    </div>
 
     <div class="camera-container">
 
@@ -601,7 +827,7 @@
             </div>
             <div class="lcd-metric" style="align-items: center;">
                 <span class="lcd-label">Intensity</span>
-                <span id="lcdIntensity">100%</span>
+                <span id="lcdIntensity">60%</span>
             </div>
             <div class="lcd-metric" style="align-items: flex-end;">
                 <span class="lcd-label">Status</span>
@@ -667,8 +893,8 @@
             <div class="control-group">
                 <span class="sticker-label">🎛️ Exposure Intensity</span>
                 <div class="slider-container">
-                    <input type="range" id="sliderIntensitas" class="range-slider" min="0" max="100" value="100">
-                    <span id="nilaiKetebalan" class="slider-val">100%</span>
+                    <input type="range" id="sliderIntensitas" class="range-slider" min="0" max="100" value="60">
+                    <span id="nilaiKetebalan" class="slider-val">60%</span>
                 </div>
             </div>
 
@@ -754,6 +980,14 @@
 
         // Initialize telemetry
         updateTelemetry();
+        updateSliderFill(sliderIntensitas);
+
+        // Introduction screen dismiss handler
+        document.getElementById('introBtn').addEventListener('click', () => {
+            const introScreen = document.getElementById('introScreen');
+            introScreen.classList.add('hiding');
+            setTimeout(() => introScreen.remove(), 500);
+        });
 
         // Trigger physical shutter click
         shutterBtn.addEventListener('click', () => {
@@ -861,6 +1095,7 @@
             const val = event.target.value;
             nilaiKetebalan.innerText = `${val}%`;
             updateTelemetry();
+            updateSliderFill(sliderIntensitas);
         });
 
         sliderIntensitas.addEventListener('change', () => {
@@ -920,6 +1155,13 @@
         `;
             }
         });
+
+        // Slider track fill visualization
+        function updateSliderFill(slider) {
+            const val = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+            slider.style.background = `linear-gradient(to right, var(--camera-accent) 0%, var(--camera-accent) ${val}%, var(--border-color) ${val}%, var(--border-color) 100%)`;
+            slider.style.borderRadius = '3px';
+        }
 
         // Helper functions for UI/UX
         function setCameraState(state, vfText, lcdText) {
