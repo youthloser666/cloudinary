@@ -579,175 +579,122 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* Introduction Screen */
-        .intro-screen {
-            position: fixed;
+        /* Live Camera Feed */
+        #cameraFeed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        #captureCanvas {
+            display: none;
+        }
+
+        /* Shutter flash effect */
+        .shutter-flash {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--bg-color);
-            background-image:
-                radial-gradient(circle at 50% 20%, rgba(255, 82, 82, 0.06) 0%, transparent 50%),
-                radial-gradient(circle at 50% 80%, rgba(255, 179, 0, 0.04) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(28, 28, 34, 0.5) 0%, rgba(13, 13, 16, 0.98) 100%);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            overflow-y: auto;
-        }
-
-        .intro-screen.hiding {
-            animation: introFadeOut 0.5s ease forwards;
+            background: white;
+            z-index: 30;
+            animation: flashAnim 0.3s ease-out forwards;
             pointer-events: none;
         }
 
-        @keyframes introFadeOut {
-            from { opacity: 1; transform: scale(1); }
-            to { opacity: 0; transform: scale(1.04); }
+        @keyframes flashAnim {
+            0% { opacity: 0.9; }
+            100% { opacity: 0; }
         }
 
-        .intro-content {
-            text-align: center;
-            max-width: 380px;
-            animation: introContentIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        /* Shutter action row: Gallery | Shutter | Flip */
+        .shutter-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
         }
 
-        @keyframes introContentIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .intro-camera-icon {
-            width: 72px;
-            height: 72px;
-            margin: 0 auto 20px;
-            background: rgba(255, 82, 82, 0.08);
-            border: 2px solid rgba(255, 82, 82, 0.15);
+        .action-circle-btn {
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid #484852;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            animation: iconPulse 3s ease-in-out infinite;
+            transition: background 0.2s, border-color 0.2s;
+            outline: none;
         }
 
-        @keyframes iconPulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.1); }
-            50% { box-shadow: 0 0 0 12px rgba(255, 82, 82, 0); }
+        .action-circle-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #666;
         }
 
-        .intro-logo-text {
-            font-family: var(--font-retro);
-            font-size: 2.2rem;
-            font-weight: bold;
-            letter-spacing: 4px;
-            color: #e2e2e9;
-            margin-bottom: 4px;
+        .action-circle-btn:active {
+            background: rgba(255, 255, 255, 0.18);
+            transform: scale(0.95);
+        }
+
+        .action-circle-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: #9b9ba4;
+        }
+
+        .shutter-btn-labels {
             display: flex;
-            align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 28px;
+            margin-top: 6px;
         }
 
-        .intro-logo-text span {
-            background: var(--camera-accent);
-            color: #000;
-            padding: 2px 10px;
-            border-radius: 6px;
-            font-size: 1.1rem;
-        }
-
-        .intro-tagline {
+        .action-label {
+            width: 48px;
+            text-align: center;
             font-family: var(--font-retro);
-            font-size: 0.8rem;
-            color: var(--lcd-glow);
-            text-shadow: 0 0 8px var(--lcd-glow-dim);
-            letter-spacing: 3px;
+            font-size: 0.55rem;
+            color: #666;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            margin-bottom: 24px;
         }
 
-        .intro-divider {
-            width: 50px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
-            margin: 0 auto 20px;
+        .shutter-label-center {
+            width: 72px;
+            text-align: center;
         }
 
-        .intro-desc {
-            font-family: var(--font-body);
-            font-size: 0.85rem;
-            color: #8c8c9a;
-            line-height: 1.8;
-            margin-bottom: 24px;
-            padding: 0 8px;
-        }
-
-        .intro-features {
+        /* Camera permission error state */
+        .camera-error-view {
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 32px;
-        }
-
-        .intro-feature {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-family: var(--font-body);
-            font-size: 0.8rem;
-            color: #b0b0bc;
-            text-align: left;
-            display: flex;
             align-items: center;
-            gap: 10px;
-            transition: border-color 0.2s;
+            justify-content: center;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 20px;
         }
 
-        .intro-feature:hover {
-            border-color: rgba(255, 255, 255, 0.12);
+        .camera-error-view svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--camera-accent);
+            margin-bottom: 10px;
+            opacity: 0.6;
         }
 
-        .intro-feature-icon {
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .intro-btn {
-            background: linear-gradient(135deg, #ff5252, #cc1e1e);
-            color: #fff;
-            border: none;
-            padding: 16px 48px;
-            border-radius: 14px;
-            font-family: var(--font-retro);
-            font-size: 1rem;
-            letter-spacing: 2px;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(255, 82, 82, 0.25), 0 2px 4px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-transform: uppercase;
-        }
-
-        .intro-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(255, 82, 82, 0.35), 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .intro-btn:active {
-            transform: translateY(1px);
-            box-shadow: 0 4px 12px rgba(255, 82, 82, 0.2);
-        }
-
-        .intro-footer {
-            margin-top: 24px;
-            font-family: var(--font-retro);
-            font-size: 0.6rem;
-            color: #333;
-            letter-spacing: 1px;
+        .camera-error-view p {
+            font-size: 0.75rem;
+            max-width: 220px;
+            line-height: 1.5;
+            color: #777;
         }
 
         /* Slider cross-browser fixes */
@@ -777,37 +724,6 @@
 </head>
 
 <body>
-
-    <!-- Introduction Screen -->
-    <div class="intro-screen" id="introScreen">
-        <div class="intro-content">
-            <div class="intro-camera-icon">📷</div>
-            <div class="intro-logo-text">DISPO <span>CAM-100</span></div>
-            <div class="intro-tagline">Kamera Analog Digital</div>
-            <div class="intro-divider"></div>
-            <p class="intro-desc">
-                Selamat datang di DISPO! Ubah foto biasa kamu jadi karya seni bergaya
-                film analog klasik. Pilih roll film favoritmu, atur intensitas
-                eksposur, lalu jepret dan simpan hasilnya.
-            </p>
-            <div class="intro-features">
-                <div class="intro-feature">
-                    <span class="intro-feature-icon">🎞️</span>
-                    <span>5 pilihan roll film analog autentik</span>
-                </div>
-                <div class="intro-feature">
-                    <span class="intro-feature-icon">🎛️</span>
-                    <span>Kontrol intensitas eksposur sesuai selera</span>
-                </div>
-                <div class="intro-feature">
-                    <span class="intro-feature-icon">💾</span>
-                    <span>Simpan hasil jepretan ke galeri digital</span>
-                </div>
-            </div>
-            <button class="intro-btn" id="introBtn">MULAI MOTRET →</button>
-            <div class="intro-footer">v1.2 · Powered by Cloudinary</div>
-        </div>
-    </div>
 
     <div class="camera-container">
 
@@ -860,7 +776,19 @@
                     <path
                         d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
                 </svg>
-                <p>SNAP A PHOTO WITH THE SHUTTER BUTTON TO BEGIN</p>
+                <p>MEMULAI KAMERA...</p>
+            </div>
+
+            <!-- Live Camera Feed -->
+            <video id="cameraFeed" playsinline autoplay muted></video>
+
+            <!-- Capture Canvas (hidden) -->
+            <canvas id="captureCanvas"></canvas>
+
+            <!-- Camera Error View -->
+            <div class="camera-error-view" id="cameraErrorView" style="display:none;">
+                <svg viewBox="0 0 24 24"><path d="M20 5h-3.17L15 3H9L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-6 10.5V13H9v-2h5V8.5L18.5 12 14 15.5z"/></svg>
+                <p>Kamera tidak tersedia.<br>Gunakan tombol <strong>GALERI</strong> untuk upload foto.</p>
             </div>
 
             <!-- Main Photo Display -->
@@ -886,6 +814,7 @@
                     <option value="gru.cube">🎨 Gru Film V1 (Warm Analog)</option>
                     <option value="gru2.cube">🎨 Gru Film V2 (Vintage Pastel)</option>
                     <option value="blau.cube">🎨 Blau Film (Cool Cinematic)</option>
+                    <option value="effect:dashcam_grunge">🎬 Dashcam Grunge (Warm)</option>
                 </select>
             </div>
 
@@ -900,10 +829,22 @@
 
         </div>
 
-        <!-- Shutter Release -->
+        <!-- Shutter Release + Gallery + Flip Camera -->
         <div class="shutter-wrapper">
-            <button class="shutter-btn" id="shutterBtn" type="button" aria-label="Take Photo"></button>
-            <div class="shutter-label">SHUTTER</div>
+            <div class="shutter-actions">
+                <button class="action-circle-btn" id="galleryBtn" type="button" aria-label="Open Gallery">
+                    <svg viewBox="0 0 24 24"><path d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/></svg>
+                </button>
+                <button class="shutter-btn" id="shutterBtn" type="button" aria-label="Take Photo"></button>
+                <button class="action-circle-btn" id="flipCameraBtn" type="button" aria-label="Flip Camera">
+                    <svg viewBox="0 0 24 24"><path d="M20 5h-3.17L15 3H9L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-5 7V9H9v3H6l6 6 6-6h-3zm-2-5l-6-6v3h6V2h3v3h3l-6 6z"/></svg>
+                </button>
+            </div>
+            <div class="shutter-btn-labels">
+                <span class="action-label">GALERI</span>
+                <span class="action-label shutter-label-center">SHUTTER</span>
+                <span class="action-label">FLIP</span>
+            </div>
         </div>
 
         <!-- Save to Gallery Button -->
@@ -917,8 +858,8 @@
             </button>
         </div>
 
-        <!-- Hidden Input Camera -->
-        <input type="file" accept="image/*" capture="environment" id="inputKamera">
+        <!-- Hidden Input for Gallery picker (no capture attribute) -->
+        <input type="file" accept="image/*" id="inputKamera">
 
         <!-- Bottom tiny status -->
         <div class="system-status">SYS.LOC: ONLINE | BATT: 100% | DISPO-SYS V1.2</div>
@@ -931,11 +872,18 @@
     <script>
         // Core Elements
         const shutterBtn = document.getElementById('shutterBtn');
+        const galleryBtn = document.getElementById('galleryBtn');
+        const flipCameraBtn = document.getElementById('flipCameraBtn');
         const inputKamera = document.getElementById('inputKamera');
         const usernameInput = document.getElementById('usernameInput');
         const pilihFilter = document.getElementById('pilihFilter');
         const sliderIntensitas = document.getElementById('sliderIntensitas');
         const nilaiKetebalan = document.getElementById('nilaiKetebalan');
+
+        // Camera elements
+        const cameraFeed = document.getElementById('cameraFeed');
+        const captureCanvas = document.getElementById('captureCanvas');
+        const cameraErrorView = document.getElementById('cameraErrorView');
 
         // Viewport & Overlays
         const hasilFoto = document.getElementById('hasilFoto');
@@ -946,6 +894,7 @@
         const actionBtnContainer = document.getElementById('actionBtnContainer');
         const saveBtn = document.getElementById('saveBtn');
         const toast = document.getElementById('toast');
+        const viewfinder = document.getElementById('viewfinder');
 
         // LED & LCD Diagnostics
         const statusLed = document.getElementById('statusLed');
@@ -953,7 +902,7 @@
         const lcdIntensity = document.getElementById('lcdIntensity');
         const lcdStatus = document.getElementById('lcdStatus');
 
-        // Cloudinary credentials (direct upload parameters, updated from backend env)
+        // Cloudinary credentials
         let cloudName = 'dqjrd00yu';
         let uploadPreset = 'mfwcupload';
 
@@ -972,47 +921,134 @@
         }
         fetchCloudinaryConfig();
 
-        // Global states to cache image URL parts
+        // Global states
         let baseUrl = '';
         let restOfUrl = '';
         let originalUrl = '';
         let currentFinalUrl = '';
+        let currentStream = null;
+        let currentFacingMode = 'environment';
+        let cameraAvailable = false;
 
-        // Initialize telemetry
-        updateTelemetry();
-        updateSliderFill(sliderIntensitas);
-
-        // Introduction screen dismiss handler
-        document.getElementById('introBtn').addEventListener('click', () => {
-            const introScreen = document.getElementById('introScreen');
-            introScreen.classList.add('hiding');
-            setTimeout(() => introScreen.remove(), 500);
-        });
-
-        // Trigger physical shutter click
-        shutterBtn.addEventListener('click', () => {
-            // Prompt user to enter Instagram handle if empty, but don't block upload trigger
-            if (!usernameInput.value.trim()) {
-                usernameInput.focus();
-                // Give a quick highlight warning
-                usernameInput.style.borderColor = 'var(--camera-accent)';
-                setTimeout(() => {
-                    usernameInput.style.borderColor = 'var(--border-color)';
-                }, 1000);
+        // Dashcam Grunge Warm effect definition (Cloudinary transformations)
+        const EFFECT_FILTERS = {
+            'dashcam_grunge': {
+                base: { sepia: 40, contrast: 25, brightness: -5, vignette: 40 },
+                build: function(intensity) {
+                    const s = intensity / 100;
+                    const sep = Math.round(this.base.sepia * s);
+                    const con = Math.round(this.base.contrast * s);
+                    const bri = Math.round(this.base.brightness * s);
+                    const vig = Math.round(this.base.vignette * s);
+                    let effects = '';
+                    if (sep > 0) effects += `e_sepia:${sep}/`;
+                    if (con !== 0) effects += `e_contrast:${con}/`;
+                    if (bri !== 0) effects += `e_brightness:${bri}/`;
+                    if (vig > 0) effects += `e_vignette:${vig}/`;
+                    return effects;
+                }
             }
-            inputKamera.click();
-        });
+        };
 
-        // Handle image file selection/snap
-        inputKamera.addEventListener('change', async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
+        // ========== CAMERA FUNCTIONS ==========
 
-            // Update camera states
+        async function startCamera() {
+            try {
+                // Stop existing stream if any
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                    currentStream = null;
+                }
+
+                const constraints = {
+                    video: {
+                        facingMode: currentFacingMode,
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    },
+                    audio: false
+                };
+
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                currentStream = stream;
+                cameraFeed.srcObject = stream;
+                cameraFeed.style.display = 'block';
+                placeholderView.style.display = 'none';
+                cameraErrorView.style.display = 'none';
+                hasilFoto.style.display = 'none';
+                cameraAvailable = true;
+                vfStatusText.innerText = 'LIVE';
+                lcdStatus.innerText = 'LIVE';
+                statusLed.className = 'status-led ready';
+                console.log('Camera started:', currentFacingMode);
+            } catch (err) {
+                console.error('Camera access error:', err);
+                cameraAvailable = false;
+                cameraFeed.style.display = 'none';
+                placeholderView.style.display = 'none';
+                cameraErrorView.style.display = 'flex';
+                vfStatusText.innerText = 'NO CAMERA';
+                lcdStatus.innerText = 'ERR';
+            }
+        }
+
+        async function flipCamera() {
+            currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+            await startCamera();
+        }
+
+        function triggerShutterFlash() {
+            const flash = document.createElement('div');
+            flash.className = 'shutter-flash';
+            viewfinder.appendChild(flash);
+            flash.addEventListener('animationend', () => flash.remove());
+        }
+
+        async function captureFromCamera() {
+            if (!cameraAvailable || !cameraFeed.srcObject) {
+                alert('Kamera tidak tersedia. Gunakan tombol Galeri.');
+                return;
+            }
+
+            // Trigger flash effect
+            triggerShutterFlash();
+
+            // Small delay for flash visual
+            await new Promise(r => setTimeout(r, 150));
+
+            // Capture frame from video
+            captureCanvas.width = cameraFeed.videoWidth;
+            captureCanvas.height = cameraFeed.videoHeight;
+            const ctx = captureCanvas.getContext('2d');
+
+            // If front camera, mirror the image
+            if (currentFacingMode === 'user') {
+                ctx.translate(captureCanvas.width, 0);
+                ctx.scale(-1, 1);
+            }
+            ctx.drawImage(cameraFeed, 0, 0);
+            ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+
+            // Convert canvas to blob and upload
+            captureCanvas.toBlob(async (blob) => {
+                if (!blob) {
+                    alert('Gagal capture foto.');
+                    return;
+                }
+                await uploadToCloudinary(blob);
+            }, 'image/jpeg', 0.92);
+        }
+
+        // ========== UPLOAD FUNCTION (shared by camera capture & gallery) ==========
+
+        async function uploadToCloudinary(fileOrBlob) {
             setCameraState('busy', 'WINDING FILM...', 'WIND');
 
+            // Hide camera feed, show loading
+            cameraFeed.style.display = 'none';
+
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('file', fileOrBlob, 'dispo_photo.jpg');
             formData.append('upload_preset', uploadPreset);
 
             try {
@@ -1026,53 +1062,120 @@
                 if (data.error) {
                     console.error("Cloudinary error:", data.error.message);
                     alert(`Cloudinary Error: ${data.error.message}`);
-                    resetCameraState();
+                    showCameraFeed();
                     return;
                 }
 
                 if (data.secure_url) {
                     originalUrl = data.secure_url;
 
-                    // Split the URL to extract transform injection point
                     const parts = originalUrl.split('/upload/');
                     if (parts.length === 2) {
                         baseUrl = parts[0];
                         restOfUrl = parts[1];
-
-                        // Render the photo with the current settings
                         applyFilterTransformation();
                         actionBtnContainer.style.display = 'block';
                     } else {
-                        console.error("Invalid secure URL format from Cloudinary");
-                        alert("Error parsing image URL structure.");
-                        resetCameraState();
+                        console.error("Invalid secure URL format");
+                        alert("Error parsing image URL.");
+                        showCameraFeed();
                     }
                 }
             } catch (error) {
                 console.error("Upload network error:", error);
-                alert("Network error occurred during image upload.");
-                resetCameraState();
+                alert("Network error during upload.");
+                showCameraFeed();
             }
-        });
+        }
 
-        // Reconstruct Cloudinary URL with filters & opacity details
+        function showCameraFeed() {
+            if (cameraAvailable) {
+                cameraFeed.style.display = 'block';
+                hasilFoto.style.display = 'none';
+                placeholderView.style.display = 'none';
+                setCameraState('ready', 'LIVE', 'LIVE');
+            } else {
+                cameraErrorView.style.display = 'flex';
+                setCameraState('ready', 'NO CAMERA', 'STBY');
+            }
+        }
+
+        // ========== FILTER TRANSFORMATION ==========
+
         function applyFilterTransformation() {
             if (!baseUrl || !restOfUrl) return;
 
             setCameraState('busy', 'DEVELOPING...', 'DEV');
 
             const filter = pilihFilter.value;
-            const intensity = sliderIntensitas.value;
+            const intensity = parseInt(sliderIntensitas.value);
 
-            // Exact user-specified format: BaseURL/upload/l_lut:${selectedFilter},o_${sliderIntensity}/fl_layer_apply/RestOfURL
-            currentFinalUrl = `${baseUrl}/upload/l_lut:${filter},o_${intensity}/fl_layer_apply/${restOfUrl}`;
+            if (filter.startsWith('effect:')) {
+                // Effect-based filter (Cloudinary transformations)
+                const effectName = filter.split(':')[1];
+                const effectDef = EFFECT_FILTERS[effectName];
 
-            // Update image source which initiates the download
+                if (effectDef) {
+                    let effects = effectDef.build(intensity);
+
+                    // Add timestamp overlay for dashcam effect
+                    if (effectName === 'dashcam_grunge') {
+                        const now = new Date();
+                        const pad = (n) => String(n).padStart(2, '0');
+                        const ts = `${pad(now.getDate())}.${pad(now.getMonth()+1)}.${now.getFullYear()} ${pad(now.getHours())}${encodeURIComponent(':')}${pad(now.getMinutes())}`;
+                        effects += `l_text:courier_new_14_bold:${ts},g_south_east,x_15,y_15,co_rgb:ffaa00,o_80/fl_layer_apply/`;
+                    }
+
+                    currentFinalUrl = `${baseUrl}/upload/${effects}${restOfUrl}`;
+                } else {
+                    // Fallback: no effect
+                    currentFinalUrl = `${baseUrl}/upload/${restOfUrl}`;
+                }
+            } else {
+                // LUT-based filter (existing)
+                currentFinalUrl = `${baseUrl}/upload/l_lut:${filter},o_${intensity}/fl_layer_apply/${restOfUrl}`;
+            }
+
             hasilFoto.src = currentFinalUrl;
             placeholderView.style.display = 'none';
+            cameraFeed.style.display = 'none';
+            cameraErrorView.style.display = 'none';
         }
 
-        // Hide loader overlay and reveal image when fully loaded from Cloudinary
+        // ========== EVENT LISTENERS ==========
+
+        // Initialize telemetry
+        updateTelemetry();
+        updateSliderFill(sliderIntensitas);
+
+        // Start camera on page load
+        startCamera();
+
+        // Shutter button → capture from live camera feed
+        shutterBtn.addEventListener('click', () => {
+            captureFromCamera();
+        });
+
+        // Gallery button → open file picker
+        galleryBtn.addEventListener('click', () => {
+            inputKamera.click();
+        });
+
+        // Flip camera button
+        flipCameraBtn.addEventListener('click', () => {
+            flipCamera();
+        });
+
+        // Handle gallery file selection
+        inputKamera.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            await uploadToCloudinary(file);
+            // Reset file input so same file can be re-selected
+            inputKamera.value = '';
+        });
+
+        // Image load/error handlers
         hasilFoto.addEventListener('load', () => {
             setCameraState('ready', 'FILM PRINTED', 'DONE');
             hasilFoto.style.display = 'block';
@@ -1080,10 +1183,10 @@
 
         hasilFoto.addEventListener('error', () => {
             setCameraState('ready', 'RENDER ERROR', 'ERR');
-            alert("Failed to render filter transformation. Ensure the LUT file is correctly uploaded to Cloudinary.");
+            alert("Gagal render filter. Pastikan file LUT sudah di-upload ke Cloudinary.");
         });
 
-        // Live update on UI changes
+        // Filter change
         pilihFilter.addEventListener('change', () => {
             updateTelemetry();
             if (baseUrl && restOfUrl) {
@@ -1091,6 +1194,7 @@
             }
         });
 
+        // Slider input (live display update)
         sliderIntensitas.addEventListener('input', (event) => {
             const val = event.target.value;
             nilaiKetebalan.innerText = `${val}%`;
@@ -1098,18 +1202,19 @@
             updateSliderFill(sliderIntensitas);
         });
 
+        // Slider change (apply filter)
         sliderIntensitas.addEventListener('change', () => {
             if (baseUrl && restOfUrl) {
                 applyFilterTransformation();
             }
         });
 
-        // Send photo metadata to the server
+        // Save photo
         saveBtn.addEventListener('click', async () => {
             const username = usernameInput.value.trim() || 'Anonymous Cyclist';
 
             if (!originalUrl || !currentFinalUrl) {
-                alert("Please take a photo first.");
+                alert("Ambil foto dulu sebelum menyimpan.");
                 return;
             }
 
@@ -1120,9 +1225,7 @@
             try {
                 const response = await fetch('/api/photos', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         username: username,
                         originalUrl: originalUrl,
@@ -1138,12 +1241,12 @@
                     setCameraState('ready', 'ARCHIVED', 'STBY');
                 } else {
                     console.error("API error:", data.error);
-                    alert(`Backend Error: ${data.error || 'Failed to save photo.'}`);
+                    alert(`Backend Error: ${data.error || 'Gagal menyimpan foto.'}`);
                     setCameraState('ready', 'FILM PRINTED', 'DONE');
                 }
             } catch (error) {
                 console.error("Save network error:", error);
-                alert("Network error: Could not contact backend server.");
+                alert("Network error: Tidak bisa menghubungi server.");
                 setCameraState('ready', 'FILM PRINTED', 'DONE');
             } finally {
                 saveBtn.disabled = false;
@@ -1156,14 +1259,14 @@
             }
         });
 
-        // Slider track fill visualization
+        // ========== HELPER FUNCTIONS ==========
+
         function updateSliderFill(slider) {
             const val = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
             slider.style.background = `linear-gradient(to right, var(--camera-accent) 0%, var(--camera-accent) ${val}%, var(--border-color) ${val}%, var(--border-color) 100%)`;
             slider.style.borderRadius = '3px';
         }
 
-        // Helper functions for UI/UX
         function setCameraState(state, vfText, lcdText) {
             if (state === 'busy') {
                 statusLed.className = 'status-led busy';
@@ -1180,18 +1283,17 @@
         }
 
         function resetCameraState() {
-            setCameraState('ready', 'NO FILM LOADED', 'STBY');
+            setCameraState('ready', 'LIVE', 'LIVE');
             hasilFoto.style.display = 'none';
-            placeholderView.style.display = 'flex';
             actionBtnContainer.style.display = 'none';
             baseUrl = '';
             restOfUrl = '';
             originalUrl = '';
             currentFinalUrl = '';
+            showCameraFeed();
         }
 
         function updateTelemetry() {
-            // Get short display name for filter
             const filterFile = pilihFilter.value;
             let shortName = 'NONE';
             if (filterFile.includes('fuji')) shortName = 'FUJI';
@@ -1199,6 +1301,7 @@
             else if (filterFile.includes('gru2')) shortName = 'GRU2';
             else if (filterFile.includes('gru')) shortName = 'GRU1';
             else if (filterFile.includes('blau')) shortName = 'BLAU';
+            else if (filterFile.includes('dashcam')) shortName = 'DCAM';
 
             lcdFilter.innerText = shortName;
             lcdIntensity.innerText = `${sliderIntensitas.value}%`;
