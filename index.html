@@ -720,6 +720,323 @@
             border-radius: 3px;
             border: none;
         }
+
+        /* ========== ADD CUBE BUTTON ========== */
+        .add-cube-btn {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px dashed #3a3a45;
+            border-radius: 8px;
+            color: #8c8c9a;
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+            letter-spacing: 0.5px;
+            outline: none;
+            margin-top: 4px;
+        }
+
+        .add-cube-btn:hover {
+            border-color: var(--lcd-glow);
+            color: var(--lcd-glow);
+            background: rgba(255, 179, 0, 0.06);
+            box-shadow: 0 0 12px rgba(255, 179, 0, 0.08);
+        }
+
+        .add-cube-btn:active {
+            transform: scale(0.98);
+        }
+
+        .add-cube-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+
+        /* ========== MODAL OVERLAY ========== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 16px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 400px;
+            background: #1a1a22;
+            border: 2px solid #2b2b35;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow:
+                0 30px 60px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            transform: translateY(20px) scale(0.95);
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #111;
+        }
+
+        .modal-title {
+            font-family: var(--font-retro);
+            font-size: 1.1rem;
+            color: var(--lcd-glow);
+            text-shadow: 0 0 6px var(--lcd-glow-dim);
+            letter-spacing: 1px;
+        }
+
+        .modal-close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid #3a3a45;
+            color: #8c8c9a;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 82, 82, 0.15);
+            border-color: var(--camera-accent);
+            color: var(--camera-accent);
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-form .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Cube file drop zone */
+        .cube-drop-zone {
+            width: 100%;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px dashed #3a3a45;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            min-height: 90px;
+        }
+
+        .cube-drop-zone:hover {
+            border-color: var(--lcd-glow);
+            background: rgba(255, 179, 0, 0.04);
+        }
+
+        .cube-drop-zone.has-file {
+            border-color: #00ff66;
+            background: rgba(0, 255, 102, 0.04);
+        }
+
+        .cube-drop-zone svg {
+            width: 28px;
+            height: 28px;
+            fill: #666;
+            transition: fill 0.2s;
+        }
+
+        .cube-drop-zone:hover svg {
+            fill: var(--lcd-glow);
+        }
+
+        .cube-drop-zone.has-file svg {
+            fill: #00ff66;
+        }
+
+        .cube-drop-zone-text {
+            font-family: var(--font-retro);
+            font-size: 0.75rem;
+            color: #666;
+            letter-spacing: 0.5px;
+            text-align: center;
+            transition: color 0.2s;
+        }
+
+        .cube-drop-zone.has-file .cube-drop-zone-text {
+            color: #00ff66;
+        }
+
+        .cube-file-name {
+            font-family: var(--font-retro);
+            font-size: 0.7rem;
+            color: #00ff66;
+            margin-top: 2px;
+            word-break: break-all;
+            text-align: center;
+        }
+
+        /* Emoji picker row */
+        .emoji-picker-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .emoji-option {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--input-bg);
+            border: 2px solid var(--border-color);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            outline: none;
+        }
+
+        .emoji-option:hover {
+            border-color: var(--lcd-glow);
+            transform: scale(1.1);
+        }
+
+        .emoji-option.selected {
+            border-color: var(--lcd-glow);
+            background: rgba(255, 179, 0, 0.15);
+            box-shadow: 0 0 8px rgba(255, 179, 0, 0.2);
+        }
+
+        /* Modal action buttons */
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 11px 16px;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            outline: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .modal-btn-cancel {
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid #3a3a45;
+            color: #8c8c9a;
+        }
+
+        .modal-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #555;
+        }
+
+        .modal-btn-upload {
+            background: var(--lcd-glow);
+            border: 2px solid #000;
+            color: #000;
+            box-shadow: 0 4px 0 #996600;
+        }
+
+        .modal-btn-upload:hover {
+            background: #ffc233;
+        }
+
+        .modal-btn-upload:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .modal-btn-upload:disabled {
+            background: #444;
+            border-color: #222;
+            color: #777;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Modal progress bar */
+        .modal-progress {
+            width: 100%;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .modal-progress.active {
+            display: block;
+        }
+
+        .modal-progress-bar {
+            height: 100%;
+            background: var(--lcd-glow);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 6px var(--lcd-glow-dim);
+        }
+
+        @keyframes modalPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
     </style>
 </head>
 
@@ -816,6 +1133,10 @@
                     <option value="blau.cube">🎨 Blau Film (Cool Cinematic)</option>
                     <option value="effect:dashcam_grunge">🎬 Dashcam Grunge (Warm)</option>
                 </select>
+                <button type="button" class="add-cube-btn" id="addCubeBtn">
+                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    Add Film Roll
+                </button>
             </div>
 
             <!-- Filter Intensity -->
@@ -868,6 +1189,50 @@
 
     <!-- Success Notification toast -->
     <div class="toast" id="toast">✅ Photo archived successfully!</div>
+
+    <!-- Add Cube Modal -->
+    <div class="modal-overlay" id="addCubeModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">➕ ADD FILM ROLL</div>
+                <button class="modal-close-btn" id="modalCloseBtn" type="button">✕</button>
+            </div>
+            <div class="modal-form">
+                <div class="control-group">
+                    <span class="sticker-label">🏷️ Film Name</span>
+                    <input type="text" id="cubeNameInput" class="input-field" placeholder="e.g. Tokyo Sunset" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="control-group">
+                    <span class="sticker-label">😎 Icon</span>
+                    <div class="emoji-picker-row" id="emojiPicker">
+                        <button class="emoji-option selected" data-emoji="🎨" type="button">🎨</button>
+                        <button class="emoji-option" data-emoji="🖤" type="button">🖤</button>
+                        <button class="emoji-option" data-emoji="🎬" type="button">🎬</button>
+                        <button class="emoji-option" data-emoji="🌅" type="button">🌅</button>
+                        <button class="emoji-option" data-emoji="🌸" type="button">🌸</button>
+                        <button class="emoji-option" data-emoji="❄️" type="button">❄️</button>
+                        <button class="emoji-option" data-emoji="🔥" type="button">🔥</button>
+                        <button class="emoji-option" data-emoji="💜" type="button">💜</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <span class="sticker-label">📂 Cube File (.cube)</span>
+                    <div class="cube-drop-zone" id="cubeDropZone">
+                        <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
+                        <span class="cube-drop-zone-text" id="cubeDropText">Click or drag .cube file here</span>
+                    </div>
+                    <input type="file" id="cubeFileInput" accept=".cube" style="display:none;">
+                </div>
+                <div class="modal-progress" id="cubeProgress">
+                    <div class="modal-progress-bar" id="cubeProgressBar"></div>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-cancel" id="modalCancelBtn" type="button">Cancel</button>
+                    <button class="modal-btn modal-btn-upload" id="cubeUploadBtn" type="button" disabled>Upload & Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Core Elements
@@ -1307,12 +1672,202 @@
             lcdIntensity.innerText = `${sliderIntensitas.value}%`;
         }
 
-        function showToast() {
+        function showToast(message) {
+            if (message) toast.innerText = message;
             toast.classList.add('show');
             setTimeout(() => {
                 toast.classList.remove('show');
+                toast.innerText = '✅ Photo archived successfully!';
             }, 3500);
         }
+
+        // ========== ADD CUBE MODAL LOGIC ==========
+
+        const addCubeBtn = document.getElementById('addCubeBtn');
+        const addCubeModal = document.getElementById('addCubeModal');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
+        const cubeNameInput = document.getElementById('cubeNameInput');
+        const cubeFileInput = document.getElementById('cubeFileInput');
+        const cubeDropZone = document.getElementById('cubeDropZone');
+        const cubeDropText = document.getElementById('cubeDropText');
+        const cubeUploadBtn = document.getElementById('cubeUploadBtn');
+        const cubeProgress = document.getElementById('cubeProgress');
+        const cubeProgressBar = document.getElementById('cubeProgressBar');
+        const emojiPicker = document.getElementById('emojiPicker');
+
+        let selectedEmoji = '🎨';
+        let selectedCubeFile = null;
+
+        // Open modal
+        addCubeBtn.addEventListener('click', () => {
+            addCubeModal.classList.add('active');
+        });
+
+        // Close modal
+        function closeModal() {
+            addCubeModal.classList.remove('active');
+            // Reset form after animation
+            setTimeout(() => {
+                cubeNameInput.value = '';
+                selectedCubeFile = null;
+                cubeDropZone.classList.remove('has-file');
+                cubeDropText.innerText = 'Click or drag .cube file here';
+                cubeUploadBtn.disabled = true;
+                cubeProgress.classList.remove('active');
+                cubeProgressBar.style.width = '0%';
+                // Reset emoji selection
+                selectedEmoji = '🎨';
+                emojiPicker.querySelectorAll('.emoji-option').forEach(btn => {
+                    btn.classList.toggle('selected', btn.dataset.emoji === '🎨');
+                });
+            }, 300);
+        }
+
+        modalCloseBtn.addEventListener('click', closeModal);
+        modalCancelBtn.addEventListener('click', closeModal);
+
+        // Close on overlay click (outside modal card)
+        addCubeModal.addEventListener('click', (e) => {
+            if (e.target === addCubeModal) closeModal();
+        });
+
+        // Emoji picker
+        emojiPicker.addEventListener('click', (e) => {
+            const btn = e.target.closest('.emoji-option');
+            if (!btn) return;
+            selectedEmoji = btn.dataset.emoji;
+            emojiPicker.querySelectorAll('.emoji-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        });
+
+        // Cube drop zone click → trigger file input
+        cubeDropZone.addEventListener('click', () => {
+            cubeFileInput.click();
+        });
+
+        // Drag & drop support
+        cubeDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            cubeDropZone.style.borderColor = 'var(--lcd-glow)';
+            cubeDropZone.style.background = 'rgba(255, 179, 0, 0.08)';
+        });
+
+        cubeDropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            if (!selectedCubeFile) {
+                cubeDropZone.style.borderColor = '';
+                cubeDropZone.style.background = '';
+            }
+        });
+
+        cubeDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            cubeDropZone.style.borderColor = '';
+            cubeDropZone.style.background = '';
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.cube')) {
+                handleCubeFile(file);
+            } else {
+                alert('Hanya file .cube yang diterima!');
+            }
+        });
+
+        // File input change
+        cubeFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleCubeFile(file);
+            cubeFileInput.value = '';
+        });
+
+        function handleCubeFile(file) {
+            selectedCubeFile = file;
+            cubeDropZone.classList.add('has-file');
+            cubeDropText.innerText = file.name;
+            validateCubeForm();
+        }
+
+        // Validate form → enable/disable upload button
+        cubeNameInput.addEventListener('input', validateCubeForm);
+
+        function validateCubeForm() {
+            const nameOk = cubeNameInput.value.trim().length > 0;
+            const fileOk = selectedCubeFile !== null;
+            cubeUploadBtn.disabled = !(nameOk && fileOk);
+        }
+
+        // Upload cube to Cloudinary
+        cubeUploadBtn.addEventListener('click', async () => {
+            if (!selectedCubeFile || !cubeNameInput.value.trim()) return;
+
+            const filmName = cubeNameInput.value.trim();
+            // Generate a safe public_id from the filename
+            const rawFileName = selectedCubeFile.name;
+            const publicId = rawFileName.replace(/\.cube$/i, '').replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
+            const cubeFileName = publicId + '.cube';
+
+            cubeUploadBtn.disabled = true;
+            cubeUploadBtn.innerText = 'Uploading...';
+            cubeProgress.classList.add('active');
+            cubeProgressBar.style.width = '10%';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', selectedCubeFile, cubeFileName);
+                formData.append('upload_preset', uploadPreset);
+                formData.append('resource_type', 'raw');
+                formData.append('public_id', publicId);
+
+                cubeProgressBar.style.width = '30%';
+
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                cubeProgressBar.style.width = '70%';
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
+
+                cubeProgressBar.style.width = '100%';
+
+                if (data.secure_url) {
+                    // Add new option to filter dropdown
+                    const newOption = document.createElement('option');
+                    newOption.value = cubeFileName;
+                    newOption.textContent = `${selectedEmoji} ${filmName}`;
+                    pilihFilter.appendChild(newOption);
+
+                    // Auto-select the new filter
+                    pilihFilter.value = cubeFileName;
+                    updateTelemetry();
+
+                    // If a photo is already loaded, re-apply with new filter
+                    if (baseUrl && restOfUrl) {
+                        applyFilterTransformation();
+                    }
+
+                    // Close modal & show success
+                    closeModal();
+                    showToast(`🎞️ Film "${filmName}" berhasil ditambahkan!`);
+
+                    console.log(`[Add Cube] Uploaded: ${cubeFileName} → ${data.secure_url}`);
+                }
+            } catch (error) {
+                console.error('[Add Cube] Upload error:', error);
+                alert(`Upload gagal: ${error.message}`);
+                cubeProgress.classList.remove('active');
+                cubeProgressBar.style.width = '0%';
+            } finally {
+                cubeUploadBtn.disabled = false;
+                cubeUploadBtn.innerText = 'Upload & Add';
+                validateCubeForm();
+            }
+        });
     </script>
 </body>
 
