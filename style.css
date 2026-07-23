@@ -363,6 +363,7 @@ body {
 }
 
 .add-cube-mini:hover { border-color: var(--lcd-glow); color: var(--lcd-glow); }
+.add-cube-mini.danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(255, 68, 68, 0.1); }
 .add-cube-mini svg { width: 12px; height: 12px; fill: currentColor; }
 
 .shutter-row {

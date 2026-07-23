@@ -86,8 +86,11 @@ const App = {
             CameraEngine.showFeed();
         });
 
-        // Add Cube Modal Events
+        // Add & Delete Cube Events
         DOM.addCubeBtn.addEventListener('click', () => CubeManager.openModal());
+        if (DOM.deleteCubeBtn) {
+            DOM.deleteCubeBtn.addEventListener('click', () => CubeManager.removeSelectedCube());
+        }
         DOM.modalCloseBtn.addEventListener('click', () => CubeManager.closeModal());
         DOM.modalCancelBtn.addEventListener('click', () => CubeManager.closeModal());
         DOM.addCubeModal.addEventListener('click', (e) => {

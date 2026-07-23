@@ -78,18 +78,18 @@
                     <span class="control-label-sm">🎞️ Film Roll</span>
                     <div style="display:flex; gap:6px; align-items:center;">
                         <select id="pilihFilter" class="select-compact" style="flex:1;">
-                            <option value="fuji_bw.cube">🖤 Fuji Neopan (B&W)</option>
-                            <option value="doc.cube" selected>🎨 Kodak Portra 400</option>
-                            <option value="gru.cube">🎨 Gru Film V1</option>
-                            <option value="gru2.cube">🎨 Gru Film V2</option>
-                            <option value="blau.cube">🎨 Blau Film</option>
-                            <option value="effect:dashcam_grunge">🎬 Dashcam Grunge</option>
                         </select>
-                        <button type="button" class="add-cube-mini" id="addCubeBtn">
+                        <button type="button" class="add-cube-mini" id="addCubeBtn" title="Add new film roll">
                             <svg viewBox="0 0 24 24">
                                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                             </svg>
                             ADD
+                        </button>
+                        <button type="button" class="add-cube-mini danger" id="deleteCubeBtn" title="Remove selected film roll">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                            </svg>
+                            DEL
                         </button>
                     </div>
                 </div>

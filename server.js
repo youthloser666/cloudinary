@@ -2,6 +2,13 @@ const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const path = require('path');
 require('dotenv').config();
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dqjrd00yu',
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const app = express();
 const prisma = new PrismaClient();
@@ -174,16 +181,54 @@ app.post('/api/cubes', async (req, res) => {
   }
 });
 
-// DELETE: Delete cube filter
+// DELETE: Delete cube filter (from DB and Cloudinary)
 app.delete('/api/cubes/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    await prisma.cubeFilter.delete({ where: { id } });
-    console.log(`[Success] Cube filter deleted: ${id}`);
-    return res.json({ success: true, message: 'Cube filter deleted.' });
+    // 1. Find the cube filter by ID or fileName
+    const cube = await prisma.cubeFilter.findFirst({
+      where: {
+        OR: [
+          { id: id },
+          { fileName: id }
+        ]
+      }
+    });
+
+    if (!cube) {
+      return res.status(404).json({
+        success: false,
+        error: 'Cube filter not found in database.'
+      });
+    }
+
+    // 2. Delete raw asset from Cloudinary
+    const publicId = cube.fileName.replace(/\.cube$/i, '');
+    if (process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+      try {
+        await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
+        await cloudinary.uploader.destroy(cube.fileName, { resource_type: 'raw' });
+        console.log(`[Cloudinary Success] Destroyed raw asset: ${publicId}`);
+      } catch (cloudErr) {
+        console.warn(`[Cloudinary Warning] Could not delete ${publicId} from Cloudinary:`, cloudErr.message);
+      }
+    } else {
+      console.warn(`[Cloudinary Notice] Cloudinary API credentials not set in environment, skipped Cloudinary deletion.`);
+    }
+
+    // 3. Delete record from Prisma DB
+    await prisma.cubeFilter.delete({
+      where: { id: cube.id }
+    });
+
+    console.log(`[Success] Cube filter deleted: ${cube.id} (${cube.name})`);
+    return res.json({
+      success: true,
+      message: `Cube filter '${cube.name}' deleted successfully.`
+    });
   } catch (error) {
-    console.error('[Database Error] Failed to delete cube:', error);
+    console.error('[Database Error] Failed to delete cube filter:', error);
     return res.status(500).json({
       success: false,
       error: 'Failed to delete cube filter.',

@@ -29,6 +29,38 @@ const CubeManager = {
         }
     },
 
+    async removeSelectedCube() {
+        const selectedFileName = DOM.pilihFilter.value;
+        if (!selectedFileName) {
+            alert('Tidak ada filter yang dipilih untuk dihapus!');
+            return;
+        }
+
+        const selectedOpt = DOM.pilihFilter.options[DOM.pilihFilter.selectedIndex];
+        const filterTitle = selectedOpt ? selectedOpt.textContent : selectedFileName;
+
+        if (!confirm(`Apakah Anda yakin ingin menghapus filter "${filterTitle}"?\nFilter ini akan dihapus dari Database dan Cloudinary.`)) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`${APP_CONFIG.endpoints.cubes}/${encodeURIComponent(selectedFileName)}`, {
+                method: 'DELETE'
+            });
+            const data = await res.json();
+            if (data.success) {
+                UI.showToast(`🗑️ Filter "${filterTitle}" berhasil dihapus!`);
+                await this.loadPersistentCubes();
+                FilterEngine.updateLivePreview();
+            } else {
+                alert(`Gagal menghapus filter: ${data.error || 'Terjadi kesalahan'}`);
+            }
+        } catch (err) {
+            console.error("Error deleting filter:", err);
+            alert("Gagal koneksi ke server saat menghapus filter.");
+        }
+    },
+
     openModal() {
         DOM.addCubeModal.classList.add('active');
     },

@@ -37,8 +37,9 @@ const DOM = {
     galleryGrid: document.getElementById('galleryGrid'),
     galleryEmpty: document.getElementById('galleryEmpty'),
     galleryCount: document.getElementById('galleryCount'),
-    // Add Cube Modal
+    // Add/Manage Cube Modal
     addCubeBtn: document.getElementById('addCubeBtn'),
+    deleteCubeBtn: document.getElementById('deleteCubeBtn'),
     addCubeModal: document.getElementById('addCubeModal'),
     modalCloseBtn: document.getElementById('modalCloseBtn'),
     modalCancelBtn: document.getElementById('modalCancelBtn'),
