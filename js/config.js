@@ -33,6 +33,7 @@ const DOM = {
     vfStatusText: document.getElementById('vfStatusText'),
     viewfinder: document.getElementById('viewfinder'),
     zoomControlsOverlay: document.getElementById('zoomControlsOverlay'),
+    zoomBadge: document.getElementById('zoomBadge'),
     toast: document.getElementById('toast'),
     statusLed: document.getElementById('statusLed'),
     galleryGrid: document.getElementById('galleryGrid'),

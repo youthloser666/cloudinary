@@ -14,7 +14,7 @@
         rel="stylesheet">
 
     <!-- External Stylesheet -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.2">
 </head>
 
 <body>
@@ -34,12 +34,8 @@
                 <div class="vf-corner vf-bottom-right"></div>
                 <div class="vf-crosshair"></div>
                 <div class="vf-status-text" id="vfStatusText">NO FILM LOADED</div>
-                <div class="zoom-controls-overlay" id="zoomControlsOverlay">
-                    <button type="button" class="zoom-btn-pill active" data-zoom="1">1x</button>
-                    <button type="button" class="zoom-btn-pill" data-zoom="2">2x</button>
-                    <button type="button" class="zoom-btn-pill" data-zoom="3">3x</button>
-                    <button type="button" class="zoom-btn-pill" data-zoom="5">5x</button>
-                </div>
+                <div class="zoom-badge" id="zoomBadge">1.0x</div>
+                <div class="zoom-controls-overlay" id="zoomControlsOverlay"></div>
             </div>
 
             <div class="loading-overlay" id="loadingOverlay">

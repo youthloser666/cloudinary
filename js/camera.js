@@ -8,10 +8,31 @@ const CameraEngine = {
                 STATE.currentStream.getTracks().forEach(t => t.stop());
                 STATE.currentStream = null;
             }
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: STATE.currentFacingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
-                audio: false
-            });
+
+            let stream;
+            try {
+                // Request camera with zoom capability enabled
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: STATE.currentFacingMode,
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                        zoom: true
+                    },
+                    audio: false
+                });
+            } catch (e) {
+                // Fallback standard constraints
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: STATE.currentFacingMode,
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    },
+                    audio: false
+                });
+            }
+
             STATE.currentStream = stream;
             DOM.cameraFeed.srcObject = stream;
             DOM.cameraFeed.style.display = 'block';
@@ -21,7 +42,7 @@ const CameraEngine = {
             STATE.cameraAvailable = true;
             UI.setCameraState('ready', 'LIVE');
 
-            // Detect device camera zoom capabilities and apply initial 1x zoom
+            // Detect real hardware zoom capabilities from active camera track
             this.detectZoomCapabilities();
             await this.applyZoom(1);
             this.bindPinchZoom();
@@ -43,19 +64,35 @@ const CameraEngine = {
 
         if (STATE.currentStream) {
             const track = STATE.currentStream.getVideoTracks()[0];
-            if (track && typeof track.getCapabilities === 'function') {
-                const capabilities = track.getCapabilities();
-                if (capabilities.zoom) {
-                    STATE.zoomCapabilities = capabilities.zoom;
-                    min = capabilities.zoom.min || 1;
-                    max = capabilities.zoom.max || 5;
+            if (track) {
+                const caps = typeof track.getCapabilities === 'function' ? track.getCapabilities() : {};
+                const settings = typeof track.getSettings === 'function' ? track.getSettings() : {};
+
+                if (caps.zoom) {
+                    STATE.zoomCapabilities = caps.zoom;
+                    min = caps.zoom.min || 1;
+                    max = caps.zoom.max || 5;
+                    console.log(`[Hardware Zoom Capabilities] min: ${min}, max: ${max}, current: ${settings.zoom}`);
+                } else {
+                    STATE.zoomCapabilities = null;
                 }
             }
         }
 
-        // Build preset zoom values based on camera range
-        let presets = [0.5, 1, 2, 3, 5].filter(z => z >= min - 0.05 && z <= max + 0.1);
-        if (!presets.includes(1)) presets.unshift(1);
+        // Dynamically build presets matching hardware lens limits
+        let presets = [];
+        if (min < 0.95) presets.push(Math.round(min * 10) / 10);
+        presets.push(1);
+        if (max >= 2) presets.push(2);
+        if (max >= 3) presets.push(3);
+        if (max >= 5) presets.push(5);
+        if (max >= 10) presets.push(10);
+        if (max > 1 && max < 5 && !presets.includes(max)) {
+            presets.push(Math.round(max * 10) / 10);
+        }
+
+        // Clean & sort presets
+        presets = [...new Set(presets)].filter(z => z >= min && z <= max).sort((a, b) => a - b);
 
         DOM.zoomControlsOverlay.innerHTML = presets.map(z => 
             `<button type="button" class="zoom-btn-pill ${z === 1 ? 'active' : ''}" data-zoom="${z}">${z}x</button>`
@@ -63,19 +100,19 @@ const CameraEngine = {
     },
 
     async applyZoom(zoomValue) {
-        const targetZoom = parseFloat(zoomValue) || 1;
+        const targetZoom = Math.round((parseFloat(zoomValue) || 1) * 10) / 10;
         STATE.currentZoom = targetZoom;
 
         let hardwareSuccess = false;
 
-        // 1. Attempt WebRTC hardware camera zoom
+        // 1. Attempt hardware WebRTC track zoom
         if (STATE.currentStream) {
             const track = STATE.currentStream.getVideoTracks()[0];
             if (track && typeof track.getCapabilities === 'function') {
-                const capabilities = track.getCapabilities();
-                if (capabilities.zoom) {
-                    const min = capabilities.zoom.min || 1;
-                    const max = capabilities.zoom.max || 5;
+                const caps = track.getCapabilities();
+                if (caps.zoom) {
+                    const min = caps.zoom.min || 1;
+                    const max = caps.zoom.max || 5;
                     const clamped = Math.min(Math.max(targetZoom, min), max);
                     try {
                         await track.applyConstraints({
@@ -83,7 +120,7 @@ const CameraEngine = {
                         });
                         hardwareSuccess = true;
                     } catch (err) {
-                        console.warn("Hardware zoom error, fallback to software digital zoom:", err);
+                        console.warn("Hardware zoom applyConstraints error:", err);
                     }
                 }
             }
@@ -91,7 +128,7 @@ const CameraEngine = {
 
         STATE.hardwareZoomActive = hardwareSuccess;
 
-        // 2. CSS Transform scaling fallback for live viewfinder
+        // 2. CSS Transform scaling fallback for live feed
         const mirror = STATE.currentFacingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)';
         if (!hardwareSuccess && targetZoom > 1) {
             DOM.cameraFeed.style.transform = `${mirror} scale(${targetZoom})`;
@@ -100,7 +137,12 @@ const CameraEngine = {
             DOM.cameraFeed.style.transform = mirror;
         }
 
-        // 3. Highlight active pill button
+        // 3. Update real-time zoom badge display
+        if (DOM.zoomBadge) {
+            DOM.zoomBadge.textContent = `${targetZoom.toFixed(1)}x`;
+        }
+
+        // 4. Highlight active pill button
         if (DOM.zoomControlsOverlay) {
             DOM.zoomControlsOverlay.querySelectorAll('.zoom-btn-pill').forEach(btn => {
                 const z = parseFloat(btn.dataset.zoom);
@@ -133,11 +175,13 @@ const CameraEngine = {
                     e.touches[0].pageY - e.touches[1].pageY
                 );
                 const factor = currentDist / startDist;
+                let minZoom = 1;
                 let maxZoom = 5;
-                if (STATE.zoomCapabilities && STATE.zoomCapabilities.max) {
-                    maxZoom = STATE.zoomCapabilities.max;
+                if (STATE.zoomCapabilities) {
+                    minZoom = STATE.zoomCapabilities.min || 1;
+                    maxZoom = STATE.zoomCapabilities.max || 5;
                 }
-                let newZoom = Math.min(Math.max(startZoom * factor, 1), maxZoom);
+                let newZoom = Math.min(Math.max(startZoom * factor, minZoom), maxZoom);
                 newZoom = Math.round(newZoom * 10) / 10;
                 this.applyZoom(newZoom);
             }
