@@ -23,6 +23,7 @@ const FilterEngine = {
 
     buildUrl(filter, intensity) {
         if (!STATE.baseUrl || !STATE.restOfUrl) return '';
+        if (!filter) return `${STATE.baseUrl}/upload/${STATE.restOfUrl}`;
 
         if (filter.startsWith('effect:')) {
             const effectName = filter.split(':')[1];

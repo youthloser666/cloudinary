@@ -6,19 +6,26 @@ const CubeManager = {
         try {
             const res = await fetch(APP_CONFIG.endpoints.cubes);
             const data = await res.json();
-            if (data.success && Array.isArray(data.cubes)) {
-                data.cubes.forEach(cube => {
-                    const exists = Array.from(DOM.pilihFilter.options).some(o => o.value === cube.fileName);
-                    if (!exists) {
-                        const opt = document.createElement('option');
-                        opt.value = cube.fileName;
-                        opt.textContent = `${cube.emoji || '🎨'} ${cube.name}`;
-                        DOM.pilihFilter.appendChild(opt);
-                    }
+            DOM.pilihFilter.innerHTML = '';
+            if (data.success && Array.isArray(data.cubes) && data.cubes.length > 0) {
+                data.cubes.forEach((cube, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = cube.fileName;
+                    opt.textContent = `${cube.emoji || '🎨'} ${cube.name}`;
+                    if (index === 0) opt.selected = true;
+                    DOM.pilihFilter.appendChild(opt);
                 });
+            } else {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = '⚠️ Belum ada filter yang di-upload';
+                opt.disabled = true;
+                opt.selected = true;
+                DOM.pilihFilter.appendChild(opt);
             }
         } catch (err) {
             console.error("Could not load cubes from server DB:", err);
+            DOM.pilihFilter.innerHTML = '<option value="" disabled selected>⚠️ Belum ada filter yang di-upload</option>';
         }
     },
 
@@ -98,6 +105,11 @@ const CubeManager = {
             });
 
             DOM.cubeProgressBar.style.width = '100%';
+
+            // Clear placeholder option if present
+            if (DOM.pilihFilter.options.length === 1 && DOM.pilihFilter.options[0].value === '') {
+                DOM.pilihFilter.innerHTML = '';
+            }
 
             const exists = Array.from(DOM.pilihFilter.options).some(o => o.value === cubeFileName);
             if (!exists) {
