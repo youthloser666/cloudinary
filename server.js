@@ -10,7 +10,8 @@ const PORT = process.env.PORT || 3000;
 // Parse JSON request bodies
 app.use(express.json());
 
-// Serve static frontend files (index.html, cube files, etc.)
+// Serve static frontend files (index.html, style.css, js/, cube files, etc.)
+app.use('/js', express.static(path.join(__dirname, 'js')));
 app.use(express.static(path.join(__dirname)));
 
 // ========== PHOTO API ROUTES (CRUD) ==========
@@ -206,5 +207,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Start the server
+// Start the server for local execution
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server listening on http://localhost:${PORT}`);
+  });
+}
+
 module.exports = app;
