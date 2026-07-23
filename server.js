@@ -13,7 +13,9 @@ app.use(express.json());
 // Serve static frontend files (index.html, cube files, etc.)
 app.use(express.static(path.join(__dirname)));
 
-// API Route: Save photo to database
+// ========== PHOTO API ROUTES (CRUD) ==========
+
+// CREATE: Save photo to database
 app.post('/api/photos', async (req, res) => {
   const { username, originalUrl, finalUrl, filterName } = req.body;
 
@@ -50,6 +52,146 @@ app.post('/api/photos', async (req, res) => {
     });
   }
 });
+
+// READ: Get all photos (newest first)
+app.get('/api/photos', async (req, res) => {
+  try {
+    const photos = await prisma.photo.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+    return res.json({ success: true, photos });
+  } catch (error) {
+    console.error('[Database Error] Failed to fetch photos:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch photos.',
+      details: error.message
+    });
+  }
+});
+
+// UPDATE: Update photo (username)
+app.put('/api/photos/:id', async (req, res) => {
+  const { id } = req.params;
+  const { username } = req.body;
+
+  if (!username) {
+    return res.status(400).json({ success: false, error: 'Username is required.' });
+  }
+
+  try {
+    const photo = await prisma.photo.update({
+      where: { id },
+      data: { username: String(username).trim() }
+    });
+    console.log(`[Success] Photo updated: ${photo.id}`);
+    return res.json({ success: true, photo });
+  } catch (error) {
+    console.error('[Database Error] Failed to update photo:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to update photo.',
+      details: error.message
+    });
+  }
+});
+
+// DELETE: Delete photo
+app.delete('/api/photos/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await prisma.photo.delete({ where: { id } });
+    console.log(`[Success] Photo deleted: ${id}`);
+    return res.json({ success: true, message: 'Photo deleted.' });
+  } catch (error) {
+    console.error('[Database Error] Failed to delete photo:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to delete photo.',
+      details: error.message
+    });
+  }
+});
+
+// ========== CUBE FILTER API ROUTES ==========
+
+// READ: Get all custom cube filters
+app.get('/api/cubes', async (req, res) => {
+  try {
+    const cubes = await prisma.cubeFilter.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+    return res.json({ success: true, cubes });
+  } catch (error) {
+    console.error('[Database Error] Failed to fetch cubes:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch cube filters.',
+      details: error.message
+    });
+  }
+});
+
+// CREATE: Save cube filter to database
+app.post('/api/cubes', async (req, res) => {
+  const { name, emoji, fileName, cloudUrl } = req.body;
+
+  if (!name || !fileName || !cloudUrl) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing required fields: name, fileName, and cloudUrl are required.'
+    });
+  }
+
+  try {
+    const cube = await prisma.cubeFilter.create({
+      data: {
+        name: String(name).trim(),
+        emoji: String(emoji || '🎨').trim(),
+        fileName: String(fileName).trim(),
+        cloudUrl: String(cloudUrl).trim(),
+      }
+    });
+
+    console.log(`[Success] Cube filter saved: ${cube.id} - ${cube.name}`);
+    return res.status(201).json({ success: true, cube });
+  } catch (error) {
+    // Handle unique constraint violation
+    if (error.code === 'P2002') {
+      return res.status(409).json({
+        success: false,
+        error: 'A cube filter with this filename already exists.'
+      });
+    }
+    console.error('[Database Error] Failed to save cube:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to save cube filter.',
+      details: error.message
+    });
+  }
+});
+
+// DELETE: Delete cube filter
+app.delete('/api/cubes/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await prisma.cubeFilter.delete({ where: { id } });
+    console.log(`[Success] Cube filter deleted: ${id}`);
+    return res.json({ success: true, message: 'Cube filter deleted.' });
+  } catch (error) {
+    console.error('[Database Error] Failed to delete cube:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to delete cube filter.',
+      details: error.message
+    });
+  }
+});
+
+// ========== CONFIG & STATIC ROUTES ==========
 
 // API Route: Get Cloudinary configuration
 app.get('/api/config/cloudinary', (req, res) => {

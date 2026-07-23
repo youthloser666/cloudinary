@@ -16,3 +16,12 @@ model Photo {
   filterName  String
   createdAt   DateTime @default(now())
 }
+
+model CubeFilter {
+  id        String   @id @default(uuid())
+  name      String
+  emoji     String   @default("🎨")
+  fileName  String   @unique
+  cloudUrl  String
+  createdAt DateTime @default(now())
+}
