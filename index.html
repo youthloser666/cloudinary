@@ -1244,8 +1244,23 @@
             hasilFoto.style.display = 'block';
             setCameraState('ready', 'FILM PRINTED', 'DONE');
 
-            // Auto-save to database
             const username = usernameInput.value.trim() || 'Anonymous';
+            const newPhoto = {
+                id: 'photo_' + Date.now(),
+                username,
+                originalUrl,
+                finalUrl: currentFinalUrl,
+                filterName: pilihFilter.value,
+                createdAt: new Date().toISOString()
+            };
+
+            // Save to localStorage immediately so it NEVER resets on refresh!
+            allPhotos.unshift(newPhoto);
+            saveStoredPhotos(allPhotos);
+            renderGallery();
+            showToast('📸 Photo saved to gallery!');
+
+            // Try to sync with server DB
             try {
                 const response = await fetch('/api/photos', {
                     method: 'POST',
@@ -1259,13 +1274,16 @@
                 });
                 const data = await response.json();
                 if (data.success && data.photo) {
-                    // Prepend to gallery
-                    allPhotos.unshift(data.photo);
-                    renderGallery();
-                    showToast('📸 Photo saved to gallery!');
+                    // Update photo ID from server
+                    const idx = allPhotos.findIndex(p => p.id === newPhoto.id);
+                    if (idx !== -1) {
+                        allPhotos[idx] = data.photo;
+                        saveStoredPhotos(allPhotos);
+                        renderGallery();
+                    }
                 }
             } catch (err) {
-                console.warn("Auto-save failed:", err);
+                console.warn("Server photo save failed, cached in localStorage:", err);
             }
 
             // After 2 second preview, return to live camera
@@ -1334,17 +1352,58 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
+        // ========== DUAL PERSISTENCE (localStorage + API) ==========
+
+        function getStoredPhotos() {
+            try {
+                return JSON.parse(localStorage.getItem('dispo_photos') || '[]');
+            } catch (e) { return []; }
+        }
+
+        function saveStoredPhotos(photos) {
+            try {
+                localStorage.setItem('dispo_photos', JSON.stringify(photos));
+            } catch (e) {}
+        }
+
+        function getStoredCubes() {
+            try {
+                return JSON.parse(localStorage.getItem('dispo_cubes') || '[]');
+            } catch (e) { return []; }
+        }
+
+        function saveStoredCubes(cubes) {
+            try {
+                localStorage.setItem('dispo_cubes', JSON.stringify(cubes));
+            } catch (e) {}
+        }
+
         // ========== GALLERY ==========
         async function loadGallery() {
+            // First load from localStorage for instant display
+            const localPhotos = getStoredPhotos();
+            if (localPhotos.length > 0) {
+                allPhotos = localPhotos;
+                renderGallery();
+            }
+
+            // Then fetch from server to sync with DB
             try {
                 const res = await fetch('/api/photos');
                 const data = await res.json();
-                if (data.success) {
-                    allPhotos = data.photos;
+                if (data.success && Array.isArray(data.photos)) {
+                    // Merge DB photos with local photos (unique by id or url)
+                    const mergedMap = new Map();
+                    localPhotos.forEach(p => mergedMap.set(p.id || p.finalUrl, p));
+                    data.photos.forEach(p => mergedMap.set(p.id || p.finalUrl, p));
+                    allPhotos = Array.from(mergedMap.values());
+                    // Sort newest first
+                    allPhotos.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+                    saveStoredPhotos(allPhotos);
                     renderGallery();
                 }
             } catch (err) {
-                console.warn("Could not load gallery:", err);
+                console.warn("Server gallery fetch failed, using local storage cache:", err);
             }
         }
 
@@ -1399,6 +1458,7 @@
         }
 
         function getTimeAgo(dateStr) {
+            if (!dateStr) return 'now';
             const diff = Date.now() - new Date(dateStr).getTime();
             const mins = Math.floor(diff / 60000);
             if (mins < 1) return 'now';
@@ -1441,22 +1501,21 @@
             const newUsername = document.getElementById('detailUsername').value.trim();
             if (!newUsername) return;
 
+            const photo = allPhotos.find(p => p.id === currentDetailPhotoId);
+            if (photo) photo.username = newUsername;
+            saveStoredPhotos(allPhotos);
+            renderGallery();
+            closeDetailModal();
+            showToast('✅ Photo updated!');
+
             try {
-                const res = await fetch(`/api/photos/${currentDetailPhotoId}`, {
+                await fetch(`/api/photos/${currentDetailPhotoId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: newUsername })
                 });
-                const data = await res.json();
-                if (data.success) {
-                    const photo = allPhotos.find(p => p.id === currentDetailPhotoId);
-                    if (photo) photo.username = newUsername;
-                    renderGallery();
-                    closeDetailModal();
-                    showToast('✅ Photo updated!');
-                }
             } catch (err) {
-                alert('Failed to update photo.');
+                console.warn("DB update failed:", err);
             }
         });
 
@@ -1465,36 +1524,28 @@
             if (!currentDetailPhotoId) return;
             if (!confirm('Delete this photo?')) return;
 
+            allPhotos = allPhotos.filter(p => p.id !== currentDetailPhotoId);
+            saveStoredPhotos(allPhotos);
+            renderGallery();
+            closeDetailModal();
+            showToast('🗑 Photo deleted!');
+
             try {
-                const res = await fetch(`/api/photos/${currentDetailPhotoId}`, { method: 'DELETE' });
-                const data = await res.json();
-                if (data.success) {
-                    allPhotos = allPhotos.filter(p => p.id !== currentDetailPhotoId);
-                    renderGallery();
-                    closeDetailModal();
-                    showToast('🗑 Photo deleted!');
-                }
+                await fetch(`/api/photos/${currentDetailPhotoId}`, { method: 'DELETE' });
             } catch (err) {
-                alert('Failed to delete photo.');
+                console.warn("DB delete failed:", err);
             }
         });
 
         // Quick delete from card
         function confirmDeletePhoto(photoId) {
             if (!confirm('Delete this photo?')) return;
-            (async () => {
-                try {
-                    const res = await fetch(`/api/photos/${photoId}`, { method: 'DELETE' });
-                    const data = await res.json();
-                    if (data.success) {
-                        allPhotos = allPhotos.filter(p => p.id !== photoId);
-                        renderGallery();
-                        showToast('🗑 Photo deleted!');
-                    }
-                } catch (err) {
-                    alert('Failed to delete.');
-                }
-            })();
+            allPhotos = allPhotos.filter(p => p.id !== photoId);
+            saveStoredPhotos(allPhotos);
+            renderGallery();
+            showToast('🗑 Photo deleted!');
+
+            fetch(`/api/photos/${photoId}`, { method: 'DELETE' }).catch(e => console.warn("DB delete failed:", e));
         }
 
         // ========== ADD CUBE MODAL ==========
@@ -1612,6 +1663,22 @@
 
                 cubeProgressBar.style.width = '90%';
 
+                const newCube = {
+                    id: 'cube_' + Date.now(),
+                    name: filmName,
+                    emoji: selectedEmoji,
+                    fileName: cubeFileName,
+                    cloudUrl: data.secure_url,
+                    createdAt: new Date().toISOString()
+                };
+
+                // Save to localStorage immediately
+                const localCubes = getStoredCubes();
+                if (!localCubes.some(c => c.fileName === cubeFileName)) {
+                    localCubes.push(newCube);
+                    saveStoredCubes(localCubes);
+                }
+
                 // Save to database for persistence
                 try {
                     await fetch('/api/cubes', {
@@ -1631,10 +1698,13 @@
                 cubeProgressBar.style.width = '100%';
 
                 // Add to dropdown
-                const newOpt = document.createElement('option');
-                newOpt.value = cubeFileName;
-                newOpt.textContent = `${selectedEmoji} ${filmName}`;
-                pilihFilter.appendChild(newOpt);
+                const exists = Array.from(pilihFilter.options).some(o => o.value === cubeFileName);
+                if (!exists) {
+                    const newOpt = document.createElement('option');
+                    newOpt.value = cubeFileName;
+                    newOpt.textContent = `${selectedEmoji} ${filmName}`;
+                    pilihFilter.appendChild(newOpt);
+                }
                 pilihFilter.value = cubeFileName;
 
                 closeCubeModal();
@@ -1652,23 +1722,37 @@
 
         // ========== LOAD PERSISTENT CUBES ==========
         async function loadCubes() {
+            // First load from localStorage
+            const localCubes = getStoredCubes();
+            localCubes.forEach(cube => {
+                const exists = Array.from(pilihFilter.options).some(o => o.value === cube.fileName);
+                if (!exists) {
+                    const opt = document.createElement('option');
+                    opt.value = cube.fileName;
+                    opt.textContent = `${cube.emoji || '🎨'} ${cube.name}`;
+                    pilihFilter.appendChild(opt);
+                }
+            });
+
+            // Then fetch from server
             try {
                 const res = await fetch('/api/cubes');
                 const data = await res.json();
-                if (data.success && data.cubes) {
+                if (data.success && Array.isArray(data.cubes)) {
                     data.cubes.forEach(cube => {
-                        // Check if already exists in dropdown
                         const exists = Array.from(pilihFilter.options).some(o => o.value === cube.fileName);
                         if (!exists) {
                             const opt = document.createElement('option');
                             opt.value = cube.fileName;
-                            opt.textContent = `${cube.emoji} ${cube.name}`;
+                            opt.textContent = `${cube.emoji || '🎨'} ${cube.name}`;
                             pilihFilter.appendChild(opt);
                         }
                     });
+                    // Sync to localStorage
+                    saveStoredCubes(data.cubes);
                 }
             } catch (err) {
-                console.warn("Could not load cubes:", err);
+                console.warn("Could not load cubes from server:", err);
             }
         }
 
