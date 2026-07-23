@@ -20,6 +20,11 @@ const CameraEngine = {
             DOM.hasilFoto.style.display = 'none';
             STATE.cameraAvailable = true;
             UI.setCameraState('ready', 'LIVE');
+
+            // Detect device camera zoom capabilities and apply initial 1x zoom
+            this.detectZoomCapabilities();
+            await this.applyZoom(1);
+            this.bindPinchZoom();
         } catch (err) {
             console.error('Camera initialization error:', err);
             STATE.cameraAvailable = false;
@@ -28,6 +33,119 @@ const CameraEngine = {
             DOM.cameraErrorView.style.display = 'flex';
             UI.setCameraState('ready', 'NO CAMERA');
         }
+    },
+
+    detectZoomCapabilities() {
+        if (!DOM.zoomControlsOverlay) return;
+
+        let min = 1;
+        let max = 5;
+
+        if (STATE.currentStream) {
+            const track = STATE.currentStream.getVideoTracks()[0];
+            if (track && typeof track.getCapabilities === 'function') {
+                const capabilities = track.getCapabilities();
+                if (capabilities.zoom) {
+                    STATE.zoomCapabilities = capabilities.zoom;
+                    min = capabilities.zoom.min || 1;
+                    max = capabilities.zoom.max || 5;
+                }
+            }
+        }
+
+        // Build preset zoom values based on camera range
+        let presets = [0.5, 1, 2, 3, 5].filter(z => z >= min - 0.05 && z <= max + 0.1);
+        if (!presets.includes(1)) presets.unshift(1);
+
+        DOM.zoomControlsOverlay.innerHTML = presets.map(z => 
+            `<button type="button" class="zoom-btn-pill ${z === 1 ? 'active' : ''}" data-zoom="${z}">${z}x</button>`
+        ).join('');
+    },
+
+    async applyZoom(zoomValue) {
+        const targetZoom = parseFloat(zoomValue) || 1;
+        STATE.currentZoom = targetZoom;
+
+        let hardwareSuccess = false;
+
+        // 1. Attempt WebRTC hardware camera zoom
+        if (STATE.currentStream) {
+            const track = STATE.currentStream.getVideoTracks()[0];
+            if (track && typeof track.getCapabilities === 'function') {
+                const capabilities = track.getCapabilities();
+                if (capabilities.zoom) {
+                    const min = capabilities.zoom.min || 1;
+                    const max = capabilities.zoom.max || 5;
+                    const clamped = Math.min(Math.max(targetZoom, min), max);
+                    try {
+                        await track.applyConstraints({
+                            advanced: [{ zoom: clamped }]
+                        });
+                        hardwareSuccess = true;
+                    } catch (err) {
+                        console.warn("Hardware zoom error, fallback to software digital zoom:", err);
+                    }
+                }
+            }
+        }
+
+        STATE.hardwareZoomActive = hardwareSuccess;
+
+        // 2. CSS Transform scaling fallback for live viewfinder
+        const mirror = STATE.currentFacingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)';
+        if (!hardwareSuccess && targetZoom > 1) {
+            DOM.cameraFeed.style.transform = `${mirror} scale(${targetZoom})`;
+            DOM.cameraFeed.style.transformOrigin = 'center center';
+        } else {
+            DOM.cameraFeed.style.transform = mirror;
+        }
+
+        // 3. Highlight active pill button
+        if (DOM.zoomControlsOverlay) {
+            DOM.zoomControlsOverlay.querySelectorAll('.zoom-btn-pill').forEach(btn => {
+                const z = parseFloat(btn.dataset.zoom);
+                btn.classList.toggle('active', Math.abs(z - targetZoom) < 0.15);
+            });
+        }
+    },
+
+    bindPinchZoom() {
+        if (!DOM.viewfinder || this._pinchBound) return;
+        this._pinchBound = true;
+
+        let startDist = 0;
+        let startZoom = 1;
+
+        DOM.viewfinder.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                startDist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                startZoom = STATE.currentZoom || 1;
+            }
+        }, { passive: true });
+
+        DOM.viewfinder.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && startDist > 0) {
+                const currentDist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                const factor = currentDist / startDist;
+                let maxZoom = 5;
+                if (STATE.zoomCapabilities && STATE.zoomCapabilities.max) {
+                    maxZoom = STATE.zoomCapabilities.max;
+                }
+                let newZoom = Math.min(Math.max(startZoom * factor, 1), maxZoom);
+                newZoom = Math.round(newZoom * 10) / 10;
+                this.applyZoom(newZoom);
+            }
+        }, { passive: true });
+
+        DOM.viewfinder.addEventListener('touchend', () => {
+            startDist = 0;
+        });
     },
 
     async flip() {
@@ -50,14 +168,29 @@ const CameraEngine = {
         this.triggerFlash();
         await new Promise(r => setTimeout(r, 150));
 
-        DOM.captureCanvas.width = DOM.cameraFeed.videoWidth;
-        DOM.captureCanvas.height = DOM.cameraFeed.videoHeight;
+        const vW = DOM.cameraFeed.videoWidth;
+        const vH = DOM.cameraFeed.videoHeight;
+        DOM.captureCanvas.width = vW;
+        DOM.captureCanvas.height = vH;
         const ctx = DOM.captureCanvas.getContext('2d');
+
         if (STATE.currentFacingMode === 'user') {
             ctx.translate(DOM.captureCanvas.width, 0);
             ctx.scale(-1, 1);
         }
-        ctx.drawImage(DOM.cameraFeed, 0, 0);
+
+        const zoom = STATE.currentZoom || 1;
+        if (STATE.hardwareZoomActive || zoom === 1) {
+            ctx.drawImage(DOM.cameraFeed, 0, 0, vW, vH);
+        } else {
+            // Software crop digital zoom
+            const cropW = vW / zoom;
+            const cropH = vH / zoom;
+            const cropX = (vW - cropW) / 2;
+            const cropY = (vH - cropH) / 2;
+            ctx.drawImage(DOM.cameraFeed, cropX, cropY, cropW, cropH, 0, 0, vW, vH);
+        }
+
         ctx.setTransform(1, 0, 0, 1, 0, 0);
 
         DOM.captureCanvas.toBlob(async (blob) => {

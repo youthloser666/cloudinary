@@ -34,6 +34,12 @@
                 <div class="vf-corner vf-bottom-right"></div>
                 <div class="vf-crosshair"></div>
                 <div class="vf-status-text" id="vfStatusText">NO FILM LOADED</div>
+                <div class="zoom-controls-overlay" id="zoomControlsOverlay">
+                    <button type="button" class="zoom-btn-pill active" data-zoom="1">1x</button>
+                    <button type="button" class="zoom-btn-pill" data-zoom="2">2x</button>
+                    <button type="button" class="zoom-btn-pill" data-zoom="3">3x</button>
+                    <button type="button" class="zoom-btn-pill" data-zoom="5">5x</button>
+                </div>
             </div>
 
             <div class="loading-overlay" id="loadingOverlay">
@@ -215,6 +221,7 @@
                 </div>
                 <div class="modal-actions">
                     <button class="modal-btn modal-btn-danger" id="detailDeleteBtn" type="button">🗑 Delete</button>
+                    <button class="modal-btn modal-btn-download" id="detailDownloadBtn" type="button">⬇️ Download</button>
                     <button class="modal-btn modal-btn-save" id="detailSaveBtn" type="button">💾 Save</button>
                 </div>
             </div>

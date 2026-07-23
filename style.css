@@ -143,13 +143,54 @@ body {
 
 .vf-status-text {
     position: absolute;
-    bottom: 10px;
+    bottom: 8px;
     left: 50%;
     transform: translateX(-50%);
     font-family: var(--font-retro);
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: rgba(255, 255, 255, 0.35);
     letter-spacing: 1px;
+}
+
+.zoom-controls-overlay {
+    position: absolute;
+    bottom: 26px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 3px 6px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    z-index: 18;
+}
+
+.zoom-btn-pill {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.65);
+    font-family: var(--font-retro);
+    font-size: 0.65rem;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
+}
+
+.zoom-btn-pill:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.zoom-btn-pill.active {
+    color: #000;
+    background: var(--lcd-glow);
+    box-shadow: 0 0 8px rgba(255, 179, 0, 0.4);
 }
 
 .preview-image {
@@ -733,6 +774,10 @@ body {
 .modal-btn-danger { background: var(--danger); border: 2px solid #000; color: #fff; box-shadow: 0 3px 0 #aa0000; }
 .modal-btn-danger:hover { background: #ff6666; }
 .modal-btn-danger:active { transform: translateY(3px); box-shadow: none; }
+
+.modal-btn-download { background: #2563eb; border: 2px solid #000; color: #fff; box-shadow: 0 3px 0 #1d4ed8; }
+.modal-btn-download:hover { background: #3b82f6; }
+.modal-btn-download:active { transform: translateY(3px); box-shadow: none; }
 
 .modal-btn-save { background: var(--green-accent); border: 2px solid #000; color: #000; box-shadow: 0 3px 0 #00993d; }
 .modal-btn-save:hover { background: #33ff85; }

@@ -21,6 +21,15 @@ const App = {
         DOM.galleryBtn.addEventListener('click', () => DOM.inputKamera.click());
         DOM.flipCameraBtn.addEventListener('click', () => CameraEngine.flip());
 
+        if (DOM.zoomControlsOverlay) {
+            DOM.zoomControlsOverlay.addEventListener('click', (e) => {
+                const btn = e.target.closest('.zoom-btn-pill');
+                if (!btn) return;
+                const zoomVal = parseFloat(btn.dataset.zoom);
+                CameraEngine.applyZoom(zoomVal);
+            });
+        }
+
         DOM.inputKamera.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -131,6 +140,9 @@ const App = {
         DOM.photoDetailModal.addEventListener('click', (e) => {
             if (e.target === DOM.photoDetailModal) GalleryEngine.closeDetail();
         });
+        if (DOM.detailDownloadBtn) {
+            DOM.detailDownloadBtn.addEventListener('click', () => GalleryEngine.downloadPhoto());
+        }
         DOM.detailSaveBtn.addEventListener('click', () => GalleryEngine.updateUsername());
         DOM.detailDeleteBtn.addEventListener('click', () => GalleryEngine.deletePhoto());
     },

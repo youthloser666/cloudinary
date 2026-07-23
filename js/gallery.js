@@ -120,6 +120,33 @@ const GalleryEngine = {
         }
     },
 
+    async downloadPhoto() {
+        if (!STATE.currentDetailPhotoId) return;
+        const photo = STATE.allPhotos.find(p => p.id === STATE.currentDetailPhotoId);
+        if (!photo || !photo.finalUrl) return;
+
+        try {
+            UI.showToast("⏳ Preparing download...");
+            const res = await fetch(photo.finalUrl);
+            const blob = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            const sanitizedUser = (photo.username || 'photo').replace(/[^a-zA-Z0-9_-]/g, '_');
+            a.download = `dispocam_${sanitizedUser}_${Date.now()}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl);
+
+            UI.showToast("⬇️ Photo downloaded!");
+        } catch (err) {
+            console.warn("Direct blob download failed, opening in new tab:", err);
+            window.open(photo.finalUrl, '_blank');
+        }
+    },
+
     getFilterShortName(f) {
         if (!f) return '—';
         if (f.includes('fuji')) return 'FUJI';

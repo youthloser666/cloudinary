@@ -32,6 +32,7 @@ const DOM = {
     loadingOverlayText: document.getElementById('loadingOverlayText'),
     vfStatusText: document.getElementById('vfStatusText'),
     viewfinder: document.getElementById('viewfinder'),
+    zoomControlsOverlay: document.getElementById('zoomControlsOverlay'),
     toast: document.getElementById('toast'),
     statusLed: document.getElementById('statusLed'),
     galleryGrid: document.getElementById('galleryGrid'),
@@ -57,6 +58,7 @@ const DOM = {
     detailUsername: document.getElementById('detailUsername'),
     detailFilter: document.getElementById('detailFilter'),
     detailCloseBtn: document.getElementById('detailCloseBtn'),
+    detailDownloadBtn: document.getElementById('detailDownloadBtn'),
     detailSaveBtn: document.getElementById('detailSaveBtn'),
     detailDeleteBtn: document.getElementById('detailDeleteBtn')
 };
@@ -75,5 +77,8 @@ const STATE = {
     allPhotos: [],
     currentDetailPhotoId: null,
     selectedEmoji: '🎨',
-    selectedCubeFile: null
+    selectedCubeFile: null,
+    currentZoom: 1,
+    hardwareZoomActive: false,
+    zoomCapabilities: null
 };
